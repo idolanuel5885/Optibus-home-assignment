@@ -12,16 +12,17 @@ interface Props {
   day: Day;
   schedule: DaySchedule;
   changes: Change[]; // the last drag's changes on this day, to highlight; empty when none
+  readOnly: boolean; // published: blocks can be clicked, not dragged
   selectedId?: string;
   refused?: { screeningId: string; nonce: number }; // flash the block of the last refused drag
   onSelect: (s: Screening) => void;
   onDrop: (drag: Drag) => void;
 }
 
-export default function Timeline({ day, schedule, changes, selectedId, refused, onSelect, onDrop }: Props) {
+export default function Timeline({ day, schedule, changes, readOnly, selectedId, refused, onSelect, onDrop }: Props) {
   const highlighted = new Set(changes.filter((c) => c.kind !== 'removed').map((c) => c.screeningId));
   const ghosts = changes.flatMap((c) => (c.kind === 'added' ? [] : [{ ...c.from, movieId: c.movieId, removed: c.kind === 'removed' }]));
-  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, onDrop, onSelect);
+  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, !readOnly, onDrop, onSelect);
   const dragged = active && movieById(active.origin.movieId);
   const from = day.open;
   const to = day.close + PAST_CLOSE;
@@ -31,7 +32,7 @@ export default function Timeline({ day, schedule, changes, selectedId, refused, 
   for (let h = Math.ceil(from / 60) * 60; h <= to; h += 60) hours.push(h);
 
   return (
-    <div className="timeline">
+    <div className={`timeline${readOnly ? ' read-only' : ''}`}>
       <div className="tl-grid" style={{ width: `calc(var(--label-w) + ${width}px)` }}>
         <div className="tl-scale">
           {hours.map((h) => (

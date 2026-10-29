@@ -1,8 +1,21 @@
-export default function BlockedMessage({ message, onClose }: { message: string; onClose: () => void }) {
+interface Props {
+  message: string;
+  onEditRules: () => void;
+  onClose: () => void;
+}
+
+export default function BlockedMessage({ message, onEditRules, onClose }: Props) {
   return (
     <div className="blocked-message" role="alert">
       <span>{message}</span>
-      <a href="#" className="edit-rules" title="Editing rules isn't part of this prototype" onClick={(e) => e.preventDefault()}>
+      <a
+        href="#"
+        className="edit-rules"
+        onClick={(e) => {
+          e.preventDefault();
+          onEditRules();
+        }}
+      >
         Edit rules
       </a>
       <button className="close" onClick={onClose} aria-label="Close">

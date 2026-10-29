@@ -46,3 +46,7 @@ export function refreshCoverage(schedule: DaySchedule): DaySchedule {
     return { ...s, reasons: [{ kind: 'coverage', movieId: s.movieId, n: k, of: REQUIRED_PER_DAY }, ...reasons] };
   });
 }
+
+// How many screenings differ between two versions of a day (moved, added or removed).
+export const countChanged = (before: DaySchedule, after: DaySchedule): number =>
+  diff(before, after, () => ({ kind: 'dragged' })).length; // the reason doesn't matter for a count

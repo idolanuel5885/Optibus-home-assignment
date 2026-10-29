@@ -47,3 +47,13 @@ export const RULES: string[] = [
   'Coverage: every movie plays at least twice each day.',
   'Start times are on 5-minute steps.',
 ];
+
+export const SITES = [
+  { name: 'Downtown, Tel Aviv', setUp: true },
+  { name: 'Northgate', setUp: false },
+  { name: 'Valley Mall', setUp: false },
+];
+
+export const WEEKDAY_HOURS = WEEKDAY;
+export const WEEKEND_HOURS = WEEKEND;
+export const SUMMER_OVERRIDE = { months: 'July–August', open: 10 * 60, close: 25 * 60 + 30 }; // every day; not active for this week
