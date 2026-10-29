@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useReview } from './useReview.ts';
 import Nav, { type Page } from './ui/Nav.tsx';
-import GeneratePage from './ui/pages/GeneratePage.tsx';
 import ReviewPage from './ui/pages/ReviewPage.tsx';
-import SetupPage, { type SetupSection } from './ui/pages/SetupPage.tsx';
+import SetupGeneratePage, { type SetupBox } from './ui/pages/SetupGeneratePage.tsx';
 
 export default function App() {
   const review = useReview();
-  const [page, setPage] = useState<Page>('generate');
-  const [setupFocus, setSetupFocus] = useState<SetupSection>();
+  const [page, setPage] = useState<Page>('setup');
+  const [setupFocus, setSetupFocus] = useState<SetupBox>();
   const generated = review.week !== undefined;
 
   const navigate = (p: Page) => {
@@ -20,9 +19,9 @@ export default function App() {
     <div className="app">
       <Nav page={page} canReview={generated} onNavigate={navigate} />
       <main className="main">
-        {page === 'setup' && <SetupPage focus={setupFocus} />}
-        {page === 'generate' && (
-          <GeneratePage
+        {page === 'setup' && (
+          <SetupGeneratePage
+            focus={setupFocus}
             generated={generated}
             onGenerate={() => {
               review.generate();

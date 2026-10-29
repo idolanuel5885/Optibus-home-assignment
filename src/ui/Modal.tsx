@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 interface Props {
   title: string;
   children: ReactNode;
-  confirmLabel: string;
-  onConfirm: () => void;
+  confirmLabel?: string; // omitted: an information pop-up with a single OK
+  onConfirm?: () => void;
   onCancel: () => void;
 }
 
@@ -15,10 +15,18 @@ export default function Modal({ title, children, confirmLabel, onConfirm, onCanc
         <h2>{title}</h2>
         <div className="modal-body">{children}</div>
         <div className="modal-actions">
-          <button onClick={onCancel}>Cancel</button>
-          <button className="primary" onClick={onConfirm} autoFocus>
-            {confirmLabel}
-          </button>
+          {onConfirm ? (
+            <>
+              <button onClick={onCancel}>Cancel</button>
+              <button className="primary" onClick={onConfirm} autoFocus>
+                {confirmLabel}
+              </button>
+            </>
+          ) : (
+            <button className="primary" onClick={onCancel} autoFocus>
+              OK
+            </button>
+          )}
         </div>
       </div>
     </div>

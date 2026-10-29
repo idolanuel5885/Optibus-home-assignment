@@ -96,11 +96,8 @@ A blocked drag returns a plain-language reason, for example: "Can't move Sonata 
   - Reset to the engine's schedule: restores the baseline and clears pins; asks for confirmation.
   - Publish week: opens a confirmation showing how many screenings changed across the week, which days were edited, and the revenue compared with the engine's schedule. On confirm, status becomes Published, the schedule is read-only, and a banner appears.
 
-### 2. Generate (thin, but works)
-"Generate schedule for the week of 6 June" button → short fake loading → Review screen on Sunday.
-
-### 3. Setup (read-only, one page)
-One page with a section for each input, built from the data above. Each section shows a note: "Editing would happen here."
+### 2. Setup & Generate (one screen; read-only inputs, working Generate)
+One screen. The inputs, built from the data above, are shown as compact boxes side by side in a grid, with no large empty space:
 - **Sites:** Downtown, Northgate and Valley Mall. Only Downtown is set up; the other two say "not set up in this prototype."
 - **Theatres:** number, seats, premium flag and cleaning time.
 - **Movies:** title, runtime and demand score.
@@ -108,8 +105,12 @@ One page with a section for each input, built from the data above. Each section 
 - **Cleaning and crew rules:** the cleaning times by size, and the single night crew after 22:00.
 - **Ticket price:** ₪45, the same in every theatre, used for expected revenue.
 
+Each box has an "Edit" link at its top right (blue, underlined). Clicking it opens a small pop-up: "Editing is not available in this prototype."
+
+At the bottom of the screen: "Generate schedule for the week of 6 June" button → short fake loading → Review screen on Sunday.
+
 ### Navigation
-A simple left nav: Setup, Generate, Review.
+A simple left nav with two items: Setup & Generate, Review. The app opens on Setup & Generate.
 
 ## Out of scope; don't build
 Other sites, chat or any language-model call, editing inputs, multi-user approval, editing a published schedule ("Create new version" can be a disabled button), unpinning, holidays and seasonal overrides, swapping which movie plays in a screening, persistence, auth, mobile layout.
@@ -120,11 +121,11 @@ Other sites, chat or any language-model call, editing inputs, multi-user approva
 3. Highlights, ghosts, pin icon, change summary, revenue indicator.
 4. Side panel with reasons and change history; rules list.
 5. Blocked drags with messages.
-6. Publish flow, Generate screen, Setup stubs, navigation.
+6. Publish flow, Setup & Generate screen, navigation.
 7. Deploy, and run the demo script below end to end.
 
 ## Demo script (must work after slice 7)
-1. Generate → Review opens on Sunday.
+1. Setup & Generate → look over the inputs → Generate → Review opens on Sunday.
 2. Click a screening → its reasons appear.
 3. Drag a mid-afternoon screening from Theatre 1 to Theatre 3 → a few highlights, a pin, the change summary, and the revenue indicator updates.
 4. Undo → back to how it was.
