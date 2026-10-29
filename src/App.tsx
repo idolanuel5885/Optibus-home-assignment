@@ -3,10 +3,13 @@ import type { Change, DaySchedule, Drag, WeekSchedule } from './types.ts';
 import { DAYS } from './data.ts';
 import { generateWeek } from './engine/generate.ts';
 import { replan } from './engine/replan.ts';
+import { dayRevenue } from './engine/changes.ts';
 import Header from './ui/Header.tsx';
 import DayTabs from './ui/DayTabs.tsx';
 import Toolbar from './ui/Toolbar.tsx';
 import Timeline from './ui/Timeline.tsx';
+import RevenueIndicator from './ui/RevenueIndicator.tsx';
+import ChangeSummary from './ui/ChangeSummary.tsx';
 
 // One accepted drag. Undo restores `before`; later slices show `changes` and `revenueDelta`.
 export interface HistoryEntry {
@@ -23,8 +26,14 @@ export default function App() {
   const [baseline] = useState(generateWeek);
   const [week, setWeek] = useState<WeekSchedule>(baseline);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  // The last drag, highlighted until the next action (drag, undo, reset). A blocked drag keeps it.
+  const [highlight, setHighlight] = useState<HistoryEntry>();
   const [dayIndex, setDayIndex] = useState(0);
   const day = DAYS[dayIndex];
+  const shown = highlight?.day === dayIndex ? highlight : undefined;
+
+  const todayGap = dayRevenue(week[dayIndex]) - dayRevenue(baseline[dayIndex]);
+  const weekGap = week.reduce((sum, d, i) => sum + dayRevenue(d) - dayRevenue(baseline[i]), 0);
 
   const setDay = (index: number, schedule: DaySchedule) => setWeek((w) => w.map((d, i) => (i === index ? schedule : d)));
 
@@ -35,8 +44,10 @@ export default function App() {
       console.info(result.message); // shown in the UI in slice 5
       return;
     }
+    const entry = { day: dayIndex, drag, before, after: result.schedule, changes: result.changes, revenueDelta: result.revenueDelta };
     setDay(dayIndex, result.schedule);
-    setHistory((h) => [...h, { day: dayIndex, drag, before, after: result.schedule, changes: result.changes, revenueDelta: result.revenueDelta }]);
+    setHistory((h) => [...h, entry]);
+    setHighlight(entry);
   };
 
   const undo = () => {
@@ -44,6 +55,7 @@ export default function App() {
     if (!last) return;
     setDay(last.day, last.before);
     setHistory((h) => h.slice(0, -1));
+    setHighlight(undefined);
     setDayIndex(last.day);
   };
 
@@ -51,14 +63,21 @@ export default function App() {
     if (!window.confirm("Reset to the engine's schedule? All changes and pins will be cleared.")) return;
     setWeek(baseline);
     setHistory([]);
+    setHighlight(undefined);
   };
 
   return (
     <div className="app">
       <Header status="Draft" />
-      <Toolbar canUndo={history.length > 0} onUndo={undo} onReset={reset} />
+      <div className="toolbar-row">
+        <Toolbar canUndo={history.length > 0} onUndo={undo} onReset={reset} />
+        <RevenueIndicator today={todayGap} week={weekGap} />
+      </div>
       <DayTabs selected={dayIndex} onSelect={setDayIndex} />
-      <Timeline day={day} schedule={week[dayIndex]} onDrop={onDrop} />
+      <div className="change-summary-slot">
+        {shown && <ChangeSummary changes={shown.changes} revenueDelta={shown.revenueDelta} />}
+      </div>
+      <Timeline day={day} schedule={week[dayIndex]} changes={shown?.changes ?? []} onDrop={onDrop} />
     </div>
   );
 }

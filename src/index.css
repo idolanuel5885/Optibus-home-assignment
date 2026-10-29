@@ -30,3 +30,12 @@ button { font: inherit; cursor: pointer; }
 .toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
 .toolbar button { padding: 6px 12px; border: 1px solid #d5d8de; border-radius: 6px; background: #fff; }
 .toolbar button:disabled { color: #aab0bb; cursor: default; }
+
+.toolbar-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.toolbar-row .toolbar { margin-bottom: 0; }
+.revenue-indicator { color: #5a6170; background: #fff; border: 1px solid #d5d8de; border-radius: 6px; padding: 6px 12px; }
+.revenue-indicator strong { color: #1f2430; }
+.change-summary-slot { min-height: 40px; }
+.change-summary {
+  margin-bottom: 8px; padding: 6px 12px; border-radius: 6px; background: #eef1fb; border: 1px solid #c9d2f3; color: #1f2430;
+}
