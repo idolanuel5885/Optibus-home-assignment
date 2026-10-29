@@ -38,3 +38,12 @@ export const DAYS: Day[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map
 
 export const theatreById = (id: number): Theatre => THEATRES.find((t) => t.id === id)!;
 export const movieById = (id: string): Movie => MOVIES.find((m) => m.id === id)!;
+
+// The hard rules, as shown in "Rules enforced".
+export const RULES: string[] = [
+  'Every screening falls within opening hours and ends by closing time. A screening after midnight belongs to the previous day.',
+  "Between two screenings in the same theatre: that theatre's cleaning time. The cleaning after the last screening of the day happens after closing.",
+  "Night crew: any cleaning that starts at 22:00 or later is done by the site's single crew, one theatre at a time. Before 22:00, every theatre can be cleaned at once.",
+  'Coverage: every movie plays at least twice each day.',
+  'Start times are on 5-minute steps.',
+];

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Change, DaySchedule, Drag, WeekSchedule } from './types.ts';
+import type { DaySchedule, Drag, HistoryEntry, WeekSchedule } from './types.ts';
 import { DAYS } from './data.ts';
 import { generateWeek } from './engine/generate.ts';
 import { replan } from './engine/replan.ts';
@@ -10,16 +10,7 @@ import Toolbar from './ui/Toolbar.tsx';
 import Timeline from './ui/Timeline.tsx';
 import RevenueIndicator from './ui/RevenueIndicator.tsx';
 import ChangeSummary from './ui/ChangeSummary.tsx';
-
-// One accepted drag. Undo restores `before`; later slices show `changes` and `revenueDelta`.
-export interface HistoryEntry {
-  day: number;
-  drag: Drag;
-  before: DaySchedule;
-  after: DaySchedule;
-  changes: Change[];
-  revenueDelta: number;
-}
+import SidePanel from './ui/SidePanel.tsx';
 
 export default function App() {
   // The engine's baseline; the revenue gap will be measured against it.
@@ -29,7 +20,13 @@ export default function App() {
   // The last drag, highlighted until the next action (drag, undo, reset). A blocked drag keeps it.
   const [highlight, setHighlight] = useState<HistoryEntry>();
   const [dayIndex, setDayIndex] = useState(0);
+  const [selectedId, setSelectedId] = useState<string>();
   const day = DAYS[dayIndex];
+  const selected = week[dayIndex].find((s) => s.id === selectedId);
+  const selectDay = (index: number) => {
+    setDayIndex(index);
+    setSelectedId(undefined);
+  };
   const shown = highlight?.day === dayIndex ? highlight : undefined;
 
   const todayGap = dayRevenue(week[dayIndex]) - dayRevenue(baseline[dayIndex]);
@@ -56,7 +53,7 @@ export default function App() {
     setDay(last.day, last.before);
     setHistory((h) => h.slice(0, -1));
     setHighlight(undefined);
-    setDayIndex(last.day);
+    if (last.day !== dayIndex) selectDay(last.day);
   };
 
   const reset = () => {
@@ -73,11 +70,23 @@ export default function App() {
         <Toolbar canUndo={history.length > 0} onUndo={undo} onReset={reset} />
         <RevenueIndicator today={todayGap} week={weekGap} />
       </div>
-      <DayTabs selected={dayIndex} onSelect={setDayIndex} />
-      <div className="change-summary-slot">
-        {shown && <ChangeSummary changes={shown.changes} revenueDelta={shown.revenueDelta} />}
+      <DayTabs selected={dayIndex} onSelect={selectDay} />
+      <div className="review">
+        <div className="review-main">
+          <div className="change-summary-slot">
+            {shown && <ChangeSummary changes={shown.changes} revenueDelta={shown.revenueDelta} />}
+          </div>
+          <Timeline
+            day={day}
+            schedule={week[dayIndex]}
+            changes={shown?.changes ?? []}
+            selectedId={selectedId}
+            onSelect={(s) => setSelectedId(s.id)}
+            onDrop={onDrop}
+          />
+        </div>
+        <SidePanel selected={selected} history={history.filter((h) => h.day === dayIndex)} />
       </div>
-      <Timeline day={day} schedule={week[dayIndex]} changes={shown?.changes ?? []} onDrop={onDrop} />
     </div>
   );
 }

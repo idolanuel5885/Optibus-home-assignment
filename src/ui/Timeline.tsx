@@ -1,4 +1,4 @@
-import type { Change, Day, DaySchedule, Drag } from '../types.ts';
+import type { Change, Day, DaySchedule, Drag, Screening } from '../types.ts';
 import { THEATRES, movieById } from '../data.ts';
 import { fmt } from '../time.ts';
 import { movieColor } from './colors.ts';
@@ -12,13 +12,15 @@ interface Props {
   day: Day;
   schedule: DaySchedule;
   changes: Change[]; // the last drag's changes on this day, to highlight; empty when none
+  selectedId?: string;
+  onSelect: (s: Screening) => void;
   onDrop: (drag: Drag) => void;
 }
 
-export default function Timeline({ day, schedule, changes, onDrop }: Props) {
+export default function Timeline({ day, schedule, changes, selectedId, onSelect, onDrop }: Props) {
   const highlighted = new Set(changes.filter((c) => c.kind !== 'removed').map((c) => c.screeningId));
   const ghosts = changes.flatMap((c) => (c.kind === 'added' ? [] : [{ ...c.from, movieId: c.movieId, removed: c.kind === 'removed' }]));
-  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, onDrop, () => {});
+  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, onDrop, onSelect);
   const dragged = active && movieById(active.origin.movieId);
   const from = day.open;
   const to = day.close + PAST_CLOSE;
@@ -76,7 +78,7 @@ export default function Timeline({ day, schedule, changes, onDrop }: Props) {
                   return (
                     <div key={s.id}>
                       <div
-                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}${highlighted.has(s.id) ? ' changed' : ''}`}
+                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}${highlighted.has(s.id) ? ' changed' : ''}${selectedId === s.id ? ' selected' : ''}`}
                         {...blockHandlers(s)}
                         style={{ left: x(s.start), width: x(s.end) - x(s.start), background: movieColor(m.id) }}
                         title={`${m.title} ${fmt(s.start)}–${fmt(s.end)}`}

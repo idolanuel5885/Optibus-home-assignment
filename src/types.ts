@@ -86,3 +86,13 @@ export type BlockKind = 'opening' | 'closing' | 'pinned' | 'coverage' | 'nightCr
 export type ReplanResult =
   | { ok: true; schedule: DaySchedule; changes: Change[]; revenueDelta: number }
   | { ok: false; block: BlockKind; message: string };
+
+// One accepted drag. Undo restores `before`; the UI shows `changes` and `revenueDelta`.
+export interface HistoryEntry {
+  day: number;
+  drag: Drag;
+  before: DaySchedule;
+  after: DaySchedule;
+  changes: Change[];
+  revenueDelta: number;
+}

@@ -36,3 +36,4 @@
   overflow: hidden; pointer-events: none; color: #1f2430; background: repeating-linear-gradient(135deg, #fff 0 6px, #f0f1f4 6px 12px);
 }
 .tl-ghost.removed .tl-title { text-decoration: line-through; }
+.tl-block.selected { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #f0b429; z-index: 3; }
