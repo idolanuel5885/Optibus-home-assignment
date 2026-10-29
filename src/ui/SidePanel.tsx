@@ -15,15 +15,15 @@ export default function SidePanel({ selected, history, brokenRules, loading, det
   return (
     <aside className={`side-panel${loading ? ' loading' : ''}`}>
       <section>
+        <RulesList broken={brokenRules} />
+      </section>
+      <section>
         <h2>Why it's here</h2>
         {detailsLoading ? <p className="muted pulse">Loading the engine's reasons…</p> : <ScreeningReasons screening={selected} />}
       </section>
       <section>
         <h2>Changes to this day</h2>
         <ChangeHistory entries={history} />
-      </section>
-      <section>
-        <RulesList broken={brokenRules} />
       </section>
     </aside>
   );
