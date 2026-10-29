@@ -13,11 +13,12 @@ interface Props {
   schedule: DaySchedule;
   changes: Change[]; // the last drag's changes on this day, to highlight; empty when none
   selectedId?: string;
+  refused?: { screeningId: string; nonce: number }; // flash the block of the last refused drag
   onSelect: (s: Screening) => void;
   onDrop: (drag: Drag) => void;
 }
 
-export default function Timeline({ day, schedule, changes, selectedId, onSelect, onDrop }: Props) {
+export default function Timeline({ day, schedule, changes, selectedId, refused, onSelect, onDrop }: Props) {
   const highlighted = new Set(changes.filter((c) => c.kind !== 'removed').map((c) => c.screeningId));
   const ghosts = changes.flatMap((c) => (c.kind === 'added' ? [] : [{ ...c.from, movieId: c.movieId, removed: c.kind === 'removed' }]));
   const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, onDrop, onSelect);
@@ -76,9 +77,9 @@ export default function Timeline({ day, schedule, changes, selectedId, onSelect,
                   const m = movieById(s.movieId);
                   const afterClose = s.cleaning.start >= day.close;
                   return (
-                    <div key={s.id}>
+                    <div key={refused?.screeningId === s.id ? `${s.id}-refused-${refused.nonce}` : s.id}>
                       <div
-                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}${highlighted.has(s.id) ? ' changed' : ''}${selectedId === s.id ? ' selected' : ''}`}
+                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}${highlighted.has(s.id) ? ' changed' : ''}${selectedId === s.id ? ' selected' : ''}${refused?.screeningId === s.id ? ' refused' : ''}`}
                         {...blockHandlers(s)}
                         style={{ left: x(s.start), width: x(s.end) - x(s.start), background: movieColor(m.id) }}
                         title={`${m.title} ${fmt(s.start)}–${fmt(s.end)}`}

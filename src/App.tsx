@@ -11,6 +11,7 @@ import Timeline from './ui/Timeline.tsx';
 import RevenueIndicator from './ui/RevenueIndicator.tsx';
 import ChangeSummary from './ui/ChangeSummary.tsx';
 import SidePanel from './ui/SidePanel.tsx';
+import BlockedMessage from './ui/BlockedMessage.tsx';
 
 export default function App() {
   // The engine's baseline; the revenue gap will be measured against it.
@@ -21,11 +22,14 @@ export default function App() {
   const [highlight, setHighlight] = useState<HistoryEntry>();
   const [dayIndex, setDayIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string>();
+  // The last blocked drag's message, until the next drag, undo, reset, day switch or close.
+  const [blocked, setBlocked] = useState<{ message: string; screeningId: string; nonce: number }>();
   const day = DAYS[dayIndex];
   const selected = week[dayIndex].find((s) => s.id === selectedId);
   const selectDay = (index: number) => {
     setDayIndex(index);
     setSelectedId(undefined);
+    setBlocked(undefined);
   };
   const shown = highlight?.day === dayIndex ? highlight : undefined;
 
@@ -38,9 +42,10 @@ export default function App() {
     const before = week[dayIndex];
     const result = replan(day, before, drag);
     if (!result.ok) {
-      console.info(result.message); // shown in the UI in slice 5
+      setBlocked((b) => ({ message: result.message, screeningId: drag.screeningId, nonce: (b?.nonce ?? 0) + 1 }));
       return;
     }
+    setBlocked(undefined);
     const entry = { day: dayIndex, drag, before, after: result.schedule, changes: result.changes, revenueDelta: result.revenueDelta };
     setDay(dayIndex, result.schedule);
     setHistory((h) => [...h, entry]);
@@ -53,6 +58,7 @@ export default function App() {
     setDay(last.day, last.before);
     setHistory((h) => h.slice(0, -1));
     setHighlight(undefined);
+    setBlocked(undefined);
     if (last.day !== dayIndex) selectDay(last.day);
   };
 
@@ -61,6 +67,7 @@ export default function App() {
     setWeek(baseline);
     setHistory([]);
     setHighlight(undefined);
+    setBlocked(undefined);
   };
 
   return (
@@ -73,6 +80,7 @@ export default function App() {
       <DayTabs selected={dayIndex} onSelect={selectDay} />
       <div className="review">
         <div className="review-main">
+          {blocked && <BlockedMessage message={blocked.message} onClose={() => setBlocked(undefined)} />}
           <div className="change-summary-slot">
             {shown && <ChangeSummary changes={shown.changes} revenueDelta={shown.revenueDelta} />}
           </div>
@@ -81,6 +89,7 @@ export default function App() {
             schedule={week[dayIndex]}
             changes={shown?.changes ?? []}
             selectedId={selectedId}
+            refused={blocked}
             onSelect={(s) => setSelectedId(s.id)}
             onDrop={onDrop}
           />

@@ -59,3 +59,11 @@ button { font: inherit; cursor: pointer; }
 .rules summary { cursor: pointer; font-weight: 600; }
 .rules ol { padding-left: 20px; margin: 8px 0 0; font-size: 13px; color: #3a4050; }
 .rules li { margin: 4px 0; }
+
+.blocked-message {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 8px; padding: 8px 12px; border-radius: 6px;
+  background: #fdf0ef; border: 1px solid #f1c1bc; color: #6b1d16;
+}
+.blocked-message span { flex: 1; }
+.blocked-message .edit-rules { color: #6b1d16; font-weight: 600; white-space: nowrap; }
+.blocked-message .close { border: none; background: none; color: #6b1d16; padding: 0 4px; }

@@ -37,3 +37,9 @@
 }
 .tl-ghost.removed .tl-title { text-decoration: line-through; }
 .tl-block.selected { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #f0b429; z-index: 3; }
+.tl-block.refused { animation: refused 0.4s ease-out; }
+@keyframes refused {
+  0%, 100% { transform: translateX(0); box-shadow: 0 0 0 3px #c0392b; }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
