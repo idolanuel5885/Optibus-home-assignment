@@ -5,7 +5,7 @@ import { movieColor } from './colors.ts';
 import { useDrag } from './useDrag.ts';
 import './Timeline.css';
 
-const PX_PER_MIN = 1.5;
+const PX_PER_MIN = 1.6;
 const PAST_CLOSE = 40; // minutes shown after closing, for the end-of-night cleaning
 
 interface Props {
@@ -63,7 +63,7 @@ export default function Timeline({ day, schedule, changes, readOnly, selectedId,
                       <div
                         key={`ghost-${g.movieId}-${g.start}`}
                         className={`tl-ghost${g.removed ? ' removed' : ''}`}
-                        style={{ left: x(g.start), width: m.runtime * PX_PER_MIN, borderColor: movieColor(m.id) }}
+                        style={{ left: x(g.start), width: m.runtime * PX_PER_MIN }}
                         title={`${g.removed ? 'Removed' : 'Was here'}: ${m.title} ${fmt(g.start)}–${fmt(g.start + m.runtime)}`}
                       >
                         <span className="tl-title">{m.title}</span>
@@ -106,7 +106,7 @@ export default function Timeline({ day, schedule, changes, readOnly, selectedId,
                 {active && dragged && active.theatreId === t.id && (
                   <div
                     className="tl-preview"
-                    style={{ left: x(active.start), width: dragged.runtime * PX_PER_MIN, borderColor: movieColor(dragged.id) }}
+                    style={{ left: x(active.start), width: dragged.runtime * PX_PER_MIN, background: movieColor(dragged.id) }}
                   >
                     <span className="tl-title">{dragged.title}</span>
                     <span className="tl-time">

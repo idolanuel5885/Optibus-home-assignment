@@ -76,8 +76,11 @@ A blocked drag returns a plain-language reason, for example: "Can't move Sonata 
 
 ## Screens
 
+### 0. Login (fake)
+A login page before anything else, with a logo at the top. The username field is prefilled with user1@demo.com and the password field with masked characters, then a Login button. No real authentication: Login always succeeds and leads to Setup & Generate.
+
 ### 1. Review the schedule (the deep flow; must fully work)
-- **Header:** site, week, and status (Draft or Published). Day tabs Sun–Sat, each showing that day's hours. Weekend days are marked.
+- **Header:** site, week, and status (Draft or Published). Day tabs Sun–Sat, each showing that day's hours. Weekend days are marked. The day tabs span exactly the width of the timeline below them.
 - **Timeline:** a row per theatre (number and seats), time running left to right from opening to closing. Screenings are blocks showing the movie and start–end time. Cleaning is shown as a thin block after each screening. The timeline extends a little past closing: the closing time is a clear vertical line, and the end-of-night cleaning after the last screening of each theatre is shown past it, in grey.
 - **Drag:** a block can be dragged to a new time in the same row or to another row. It snaps to 5 minutes. On drop, the engine re-plans and the result is applied immediately.
 - **After a drag:**
@@ -86,7 +89,7 @@ A blocked drag returns a plain-language reason, for example: "Can't move Sonata 
   - Highlights stay until the next action.
   - A change summary shows: "N screenings changed · revenue change for this drag: +/−₪X".
 - **Blocked drag:** the block snaps back, and a message shows the reason, with an "Edit rules" link (stub).
-- **Revenue indicator (always visible):** "Compared with the engine's schedule: −₪X today · −₪Y this week." Neutral wording; never "loss" or "lost revenue."
+- **Revenue (always visible):** two square cards side by side, at the top of the side panel column, above the panel: **Today** and **This week**. Each shows the expected revenue of the current schedule, and below it the difference compared with the engine's schedule (e.g. "−₪X compared with the engine's schedule"). Neutral wording; never "loss" or "lost revenue."
 - **Side panel:**
   - Click a screening to see its reasons, from the engine.
   - Below that, the change history for the day: one line per drag, with what moved and why.
@@ -97,23 +100,25 @@ A blocked drag returns a plain-language reason, for example: "Can't move Sonata 
   - Publish week: opens a confirmation showing how many screenings changed across the week, which days were edited, and the revenue compared with the engine's schedule. On confirm, status becomes Published, the schedule is read-only, and a banner appears.
 
 ### 2. Setup & Generate (one screen; read-only inputs, working Generate)
-One screen. The inputs, built from the data above, are shown as compact boxes side by side in a grid, with no large empty space:
+One screen. The inputs, built from the data above, are shown as boxes in a grid that forms a clean rectangle (aligned edges, even spacing, no large empty space):
 - **Sites:** Downtown, Northgate and Valley Mall. Only Downtown is set up; the other two say "not set up in this prototype."
-- **Theatres:** number, seats, premium flag and cleaning time.
+- **Theatres:** number, seats, premium flag and cleaning time, plus the single night crew rule after 22:00.
 - **Movies:** title, runtime and demand score.
 - **Hours:** weekday and weekend hours, plus the summer override (July–August, 10:00–01:30 every day), marked "not active for this week."
-- **Cleaning and crew rules:** the cleaning times by size, and the single night crew after 22:00.
 - **Ticket price:** ₪45, the same in every theatre, used for expected revenue.
 
 Each box has an "Edit" link at its top right (blue, underlined). Clicking it opens a small pop-up: "Editing is not available in this prototype."
 
-At the bottom of the screen: "Generate schedule for the week of 6 June" button → short fake loading → Review screen on Sunday.
+At the bottom of the screen, with the same spacing from the boxes as they have between them: "Generate schedule for the week of June 6th" button → short fake loading → Review screen on Sunday.
 
 ### Navigation
-A simple left nav with two items: Setup & Generate, Review. The app opens on Setup & Generate.
+A simple left nav with two items: Setup & Generate, Review. The app opens on the Login page; after login, Setup & Generate.
+
+### Look and feel
+A light, soothing palette; a clean web font (Inter); generous spacing. The Review screen uses the full height of the window: the timeline rows are tall enough that the timeline is not followed by a large empty area.
 
 ## Out of scope; don't build
-Other sites, chat or any language-model call, editing inputs, multi-user approval, editing a published schedule ("Create new version" can be a disabled button), unpinning, holidays and seasonal overrides, swapping which movie plays in a screening, persistence, auth, mobile layout.
+Other sites, chat or any language-model call, editing inputs, multi-user approval, editing a published schedule ("Create new version" can be a disabled button), unpinning, holidays and seasonal overrides, swapping which movie plays in a screening, persistence, real authentication (the login page is a fake), mobile layout.
 
 ## Build order (one slice per session)
 1. Data, engine generate, static timeline with day tabs. Check: every day's schedule passes all five rules, verified with a small check function you write and run.
@@ -125,7 +130,7 @@ Other sites, chat or any language-model call, editing inputs, multi-user approva
 7. Deploy, and run the demo script below end to end.
 
 ## Demo script (must work after slice 7)
-1. Setup & Generate → look over the inputs → Generate → Review opens on Sunday.
+1. Login → Setup & Generate → look over the inputs → Generate → Review opens on Sunday.
 2. Click a screening → its reasons appear.
 3. Drag a mid-afternoon screening from Theatre 1 to Theatre 3 → a few highlights, a pin, the change summary, and the revenue indicator updates.
 4. Undo → back to how it was.

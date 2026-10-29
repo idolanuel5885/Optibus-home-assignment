@@ -1,12 +1,12 @@
-// One colour per movie so the day can be scanned at a glance.
+// One soft colour per movie so the day can be scanned at a glance; text on them is dark.
 const COLORS: Record<string, string> = {
-  'gravity-well': '#4f6bd8',
-  'last-ferry': '#2a9d8f',
-  'paper-lanterns': '#e9a23b',
-  'blue-hour': '#6c8ebf',
-  'kibbutz-kids-3': '#d1495b',
-  sonata: '#8e6cbf',
-  'quiet-fleet': '#5b8c5a',
-  marmalade: '#e07a3f',
+  'gravity-well': '#bcd3f2',
+  'last-ferry': '#b5e0d6',
+  'paper-lanterns': '#f6dfae',
+  'blue-hour': '#cdd5ec',
+  'kibbutz-kids-3': '#f5c6c4',
+  sonata: '#ddd0f0',
+  'quiet-fleet': '#c9e3bd',
+  marmalade: '#f8d3b8',
 };
-export const movieColor = (id: string) => COLORS[id] ?? '#888';
+export const movieColor = (id: string) => COLORS[id] ?? '#e2e5ea';

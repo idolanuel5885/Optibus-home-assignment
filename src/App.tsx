@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { useReview } from './useReview.ts';
 import Nav, { type Page } from './ui/Nav.tsx';
+import LoginPage from './ui/pages/LoginPage.tsx';
 import ReviewPage from './ui/pages/ReviewPage.tsx';
 import SetupGeneratePage, { type SetupBox } from './ui/pages/SetupGeneratePage.tsx';
 
 export default function App() {
   const review = useReview();
+  const [loggedIn, setLoggedIn] = useState(false);
   const [page, setPage] = useState<Page>('setup');
   const [setupFocus, setSetupFocus] = useState<SetupBox>();
   const generated = review.week !== undefined;
+
+  if (!loggedIn) return <LoginPage onLogin={() => setLoggedIn(true)} />;
 
   const navigate = (p: Page) => {
     setSetupFocus(undefined);
@@ -33,7 +37,7 @@ export default function App() {
           <ReviewPage
             review={review}
             onEditRules={() => {
-              setSetupFocus('cleaning');
+              setSetupFocus('theatres');
               setPage('setup');
             }}
           />

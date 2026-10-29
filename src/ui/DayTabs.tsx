@@ -12,11 +12,11 @@ export default function DayTabs({ selected, onSelect }: { selected: number; onSe
         >
           <span className="day-name">
             {d.name} {d.date}
-            {d.weekend && <span className="weekend-tag">Weekend</span>}
           </span>
           <span className="day-hours">
             {fmt(d.open)}–{fmt(d.close)}
           </span>
+          {d.weekend && <span className="weekend-tag">Weekend</span>}
         </button>
       ))}
     </nav>

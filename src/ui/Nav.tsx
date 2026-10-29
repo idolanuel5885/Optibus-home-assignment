@@ -1,3 +1,5 @@
+import Logo from './Logo.tsx';
+
 export type Page = 'setup' | 'review';
 
 interface Props {
@@ -14,7 +16,9 @@ export default function Nav({ page, canReview, onNavigate }: Props) {
   );
   return (
     <nav className="nav">
-      <div className="nav-brand">PSR Schedule</div>
+      <div className="nav-brand">
+        <Logo />
+      </div>
       {item('setup', 'Setup & Generate')}
       {item('review', 'Review', !canReview)}
       {!canReview && <p className="nav-hint">Generate the schedule first</p>}

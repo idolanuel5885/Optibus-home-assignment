@@ -6,7 +6,7 @@ import Header from '../Header.tsx';
 import DayTabs from '../DayTabs.tsx';
 import Toolbar from '../Toolbar.tsx';
 import Timeline from '../Timeline.tsx';
-import RevenueIndicator from '../RevenueIndicator.tsx';
+import RevenueCards from '../RevenueCards.tsx';
 import ChangeSummary from '../ChangeSummary.tsx';
 import SidePanel from '../SidePanel.tsx';
 import BlockedMessage from '../BlockedMessage.tsx';
@@ -23,14 +23,15 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
   const day = DAYS[dayIndex];
   const selected = week[dayIndex].find((s) => s.id === selectedId);
   const shown = highlight?.day === dayIndex ? highlight : undefined;
-  const todayGap = dayRevenue(week[dayIndex]) - dayRevenue(baseline[dayIndex]);
-  const weekGap = week.reduce((sum, d, i) => sum + dayRevenue(d) - dayRevenue(baseline[i]), 0);
+  const todayExpected = dayRevenue(week[dayIndex]);
+  const weekExpected = week.reduce((sum, d) => sum + dayRevenue(d), 0);
+  const today = { expected: todayExpected, gap: todayExpected - dayRevenue(baseline[dayIndex]) };
+  const weekTotals = { expected: weekExpected, gap: weekExpected - baseline.reduce((sum, d) => sum + dayRevenue(d), 0) };
 
   return (
     <div className="page review-page">
-      <Header status={status} />
-      {readOnly && <PublishedBanner />}
-      <div className="toolbar-row">
+      <div className="review-top">
+        <Header status={status} />
         <Toolbar
           readOnly={readOnly}
           canUndo={history.length > 0}
@@ -38,14 +39,22 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
           onReset={() => setDialog('reset')}
           onPublish={() => setDialog('publish')}
         />
-        <RevenueIndicator today={todayGap} week={weekGap} />
       </div>
-      <DayTabs selected={dayIndex} onSelect={review.selectDay} />
+      {readOnly && <PublishedBanner />}
       <div className="review">
         <div className="review-main">
+          <DayTabs selected={dayIndex} onSelect={review.selectDay} />
           {blocked && <BlockedMessage message={blocked.message} onEditRules={onEditRules} onClose={review.closeBlocked} />}
           <div className="change-summary-slot">
-            {shown && <ChangeSummary changes={shown.changes} revenueDelta={shown.revenueDelta} />}
+            {shown ? (
+              <ChangeSummary changes={shown.changes} revenueDelta={shown.revenueDelta} />
+            ) : (
+              <p className="timeline-hint">
+                {readOnly
+                  ? 'Published: click a screening to see why the engine placed it there.'
+                  : 'Drag a screening to a new time or theatre; the engine re-plans the day. Click one to see why it is there.'}
+              </p>
+            )}
           </div>
           <Timeline
             day={day}
@@ -58,7 +67,10 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
             onDrop={review.drop}
           />
         </div>
-        <SidePanel selected={selected} history={history.filter((h) => h.day === dayIndex)} />
+        <div className="review-side">
+          <RevenueCards dayLabel={`${day.name} ${day.date}`} today={today} week={weekTotals} />
+          <SidePanel selected={selected} history={history.filter((h) => h.day === dayIndex)} />
+        </div>
       </div>
 
       {dialog === 'reset' && (
