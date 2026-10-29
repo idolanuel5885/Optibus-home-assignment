@@ -10,6 +10,7 @@ import { fmt } from '../src/time.ts';
 const week = generateWeek();
 const problems: string[] = [];
 const blockedBy: Record<string, number> = {};
+const sampleMessage: Record<string, string> = {};
 let accepted = 0;
 
 // Every invariant an accepted or blocked drag must satisfy.
@@ -19,7 +20,10 @@ function checkDrag(day: Day, before: DaySchedule, drag: Drag, tag: string) {
   if (JSON.stringify(before) !== snapshot) problems.push(`${tag}: input schedule was mutated`);
   if (!r.ok) {
     blockedBy[r.block] = (blockedBy[r.block] ?? 0) + 1;
-    if (!r.message) problems.push(`${tag}: blocked without a message`);
+    sampleMessage[r.block] ??= r.message;
+    const s = before.find((x) => x.id === drag.screeningId)!;
+    const prefix = `Can't move ${movieById(s.movieId).title} to Theatre ${drag.theatreId} at ${fmt(drag.start)}: `;
+    if (!r.message.startsWith(prefix) || r.message.length <= prefix.length + 10) problems.push(`${tag}: bad message "${r.message}"`);
     return r;
   }
   const fail = (msg: string) => problems.push(`${tag}: ${msg}`);
@@ -87,6 +91,10 @@ for (const day of DAYS) {
 }
 
 console.log(`Re-plan: ${accepted} accepted, blocked: ${JSON.stringify(blockedBy)}`);
+for (const kind of ['opening', 'closing', 'pinned', 'coverage', 'nightCrew']) {
+  if (!blockedBy[kind]) problems.push(`no drag was blocked for ${kind}; that message is untested`);
+  else console.log(`  e.g. ${kind}: ${sampleMessage[kind]}`);
+}
 for (const p of problems.slice(0, 15)) console.log('  ' + p);
 if (problems.length) console.log(`Re-plan checks: FAIL (${problems.length} problems)`);
 else console.log('Re-plan checks: PASS');

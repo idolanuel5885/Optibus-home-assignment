@@ -31,10 +31,31 @@ export const START_STEP = 5; // start times on 5-minute steps
 const WEEKDAY = { open: 11 * 60, close: 24 * 60 + 30 }; // 11:00–00:30
 const WEEKEND = { open: 10 * 60, close: 25 * 60 + 30 }; // 10:00–01:30
 
+const LONG_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 export const DAYS: Day[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((name, index) => {
   const weekend = index >= 5;
-  return { index, name, date: `${6 + index} Jun`, weekend, ...(weekend ? WEEKEND : WEEKDAY) };
+  return { index, name, longName: LONG_NAMES[index], date: `${6 + index} Jun`, weekend, ...(weekend ? WEEKEND : WEEKDAY) };
 });
 
 export const theatreById = (id: number): Theatre => THEATRES.find((t) => t.id === id)!;
 export const movieById = (id: string): Movie => MOVIES.find((m) => m.id === id)!;
+
+// The hard rules, as shown in "Rules enforced": one short sentence each, numbered as in the validator.
+export const RULES: string[] = [
+  'Every screening runs within opening hours.',
+  'Each theatre gets its full cleaning time between screenings.',
+  'After 22:00, one night crew cleans one theatre at a time.',
+  'Every movie plays at least twice a day.',
+  'Start times are on 5-minute steps.',
+];
+
+export const SITES = [
+  { name: 'Downtown, Tel Aviv', setUp: true },
+  { name: 'Northgate', setUp: false },
+  { name: 'Valley Mall', setUp: false },
+];
+
+export const WEEKDAY_HOURS = WEEKDAY;
+export const WEEKEND_HOURS = WEEKEND;
+export const SUMMER_OVERRIDE = { months: 'July–August', open: 10 * 60, close: 25 * 60 + 30 }; // every day; not active for this week

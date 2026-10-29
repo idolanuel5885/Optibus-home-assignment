@@ -1,24 +1,28 @@
-import type { Change, Day, DaySchedule, Drag } from '../types.ts';
+import type { Change, Day, DaySchedule, Drag, Screening } from '../types.ts';
 import { THEATRES, movieById } from '../data.ts';
 import { fmt } from '../time.ts';
 import { movieColor } from './colors.ts';
 import { useDrag } from './useDrag.ts';
 import './Timeline.css';
 
-const PX_PER_MIN = 1.5;
+const PX_PER_MIN = 1.6;
 const PAST_CLOSE = 40; // minutes shown after closing, for the end-of-night cleaning
 
 interface Props {
   day: Day;
   schedule: DaySchedule;
   changes: Change[]; // the last drag's changes on this day, to highlight; empty when none
+  readOnly: boolean; // published: blocks can be clicked, not dragged
+  selectedId?: string;
+  refused?: { screeningId: string; nonce: number }; // flash the block of the last refused drag
+  onSelect: (s: Screening) => void;
   onDrop: (drag: Drag) => void;
 }
 
-export default function Timeline({ day, schedule, changes, onDrop }: Props) {
+export default function Timeline({ day, schedule, changes, readOnly, selectedId, refused, onSelect, onDrop }: Props) {
   const highlighted = new Set(changes.filter((c) => c.kind !== 'removed').map((c) => c.screeningId));
   const ghosts = changes.flatMap((c) => (c.kind === 'added' ? [] : [{ ...c.from, movieId: c.movieId, removed: c.kind === 'removed' }]));
-  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, onDrop, () => {});
+  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, !readOnly, onDrop, onSelect);
   const dragged = active && movieById(active.origin.movieId);
   const from = day.open;
   const to = day.close + PAST_CLOSE;
@@ -28,7 +32,7 @@ export default function Timeline({ day, schedule, changes, onDrop }: Props) {
   for (let h = Math.ceil(from / 60) * 60; h <= to; h += 60) hours.push(h);
 
   return (
-    <div className="timeline">
+    <div className={`timeline${readOnly ? ' read-only' : ''}`}>
       <div className="tl-grid" style={{ width: `calc(var(--label-w) + ${width}px)` }}>
         <div className="tl-scale">
           {hours.map((h) => (
@@ -59,7 +63,7 @@ export default function Timeline({ day, schedule, changes, onDrop }: Props) {
                       <div
                         key={`ghost-${g.movieId}-${g.start}`}
                         className={`tl-ghost${g.removed ? ' removed' : ''}`}
-                        style={{ left: x(g.start), width: m.runtime * PX_PER_MIN, borderColor: movieColor(m.id) }}
+                        style={{ left: x(g.start), width: m.runtime * PX_PER_MIN }}
                         title={`${g.removed ? 'Removed' : 'Was here'}: ${m.title} ${fmt(g.start)}–${fmt(g.start + m.runtime)}`}
                       >
                         <span className="tl-title">{m.title}</span>
@@ -74,9 +78,9 @@ export default function Timeline({ day, schedule, changes, onDrop }: Props) {
                   const m = movieById(s.movieId);
                   const afterClose = s.cleaning.start >= day.close;
                   return (
-                    <div key={s.id}>
+                    <div key={refused?.screeningId === s.id ? `${s.id}-refused-${refused.nonce}` : s.id}>
                       <div
-                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}${highlighted.has(s.id) ? ' changed' : ''}`}
+                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}${highlighted.has(s.id) ? ' changed' : ''}${selectedId === s.id ? ' selected' : ''}${refused?.screeningId === s.id ? ' refused' : ''}`}
                         {...blockHandlers(s)}
                         style={{ left: x(s.start), width: x(s.end) - x(s.start), background: movieColor(m.id) }}
                         title={`${m.title} ${fmt(s.start)}–${fmt(s.end)}`}
@@ -102,7 +106,7 @@ export default function Timeline({ day, schedule, changes, onDrop }: Props) {
                 {active && dragged && active.theatreId === t.id && (
                   <div
                     className="tl-preview"
-                    style={{ left: x(active.start), width: dragged.runtime * PX_PER_MIN, borderColor: movieColor(dragged.id) }}
+                    style={{ left: x(active.start), width: dragged.runtime * PX_PER_MIN, background: movieColor(dragged.id) }}
                   >
                     <span className="tl-title">{dragged.title}</span>
                     <span className="tl-time">

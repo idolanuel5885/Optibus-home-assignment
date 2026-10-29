@@ -1,5 +1,6 @@
 // Plain pointer-event drag for timeline blocks: horizontal movement → minutes (5-minute snap),
 // vertical position → theatre row. A release without movement counts as a click.
+// When disabled (published), every press is a click.
 import { type PointerEvent, useRef, useState } from 'react';
 import type { Drag, Screening } from '../types.ts';
 import { START_STEP } from '../data.ts';
@@ -9,7 +10,7 @@ interface Active extends Drag {
   origin: Screening;
 }
 
-export function useDrag(pxPerMin: number, onDrop: (drag: Drag) => void, onClick: (s: Screening) => void) {
+export function useDrag(pxPerMin: number, enabled: boolean, onDrop: (drag: Drag) => void, onClick: (s: Screening) => void) {
   const [active, setActive] = useState<Active>();
   const lanes = useRef(new Map<number, HTMLElement>());
 
@@ -28,7 +29,7 @@ export function useDrag(pxPerMin: number, onDrop: (drag: Drag) => void, onClick:
       setActive({ screeningId: s.id, theatreId: s.theatreId, start: s.start, originX: e.clientX, origin: s });
     },
     onPointerMove: (e: PointerEvent<HTMLElement>) => {
-      if (!active || active.screeningId !== s.id) return;
+      if (!enabled || !active || active.screeningId !== s.id) return;
       const delta = Math.round((e.clientX - active.originX) / pxPerMin / START_STEP) * START_STEP;
       const theatreId = theatreAt(e.clientY, active.theatreId);
       const start = s.start + delta;
