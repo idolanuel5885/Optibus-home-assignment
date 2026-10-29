@@ -34,7 +34,7 @@ export default function PublishDialog({ baseline, week, onConfirm, onCancel }: P
             <tr>
               <th>Edited day</th>
               <th>Screenings changed</th>
-              <th>Compared with the engine</th>
+              <th>Revenue change</th>
             </tr>
           </thead>
           <tbody>
@@ -51,7 +51,8 @@ export default function PublishDialog({ baseline, week, onConfirm, onCancel }: P
         </table>
       )}
       <p>
-        Revenue compared with the engine's schedule: <strong>{signedShekels(weekGap)}</strong> this week.
+        Revenue change compared with the engine's schedule this week:{' '}
+        <strong>{weekGap === 0 ? '₪0 (no change)' : signedShekels(weekGap)}</strong>.
       </p>
       <p className="muted">After publishing, the schedule is read-only.</p>
     </Modal>
