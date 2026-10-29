@@ -6,11 +6,12 @@ import RulesList from './RulesList.tsx';
 interface Props {
   selected?: Screening;
   history: HistoryEntry[]; // this day's drags, oldest first
+  brokenRules: Set<number>; // rule numbers the day's schedule fails (from the validator)
   loading: boolean; // the schedule is about to change: the panel pulses
   detailsLoading: boolean; // a screening was just clicked: its reasons load briefly
 }
 
-export default function SidePanel({ selected, history, loading, detailsLoading }: Props) {
+export default function SidePanel({ selected, history, brokenRules, loading, detailsLoading }: Props) {
   return (
     <aside className={`side-panel${loading ? ' loading' : ''}`}>
       <section>
@@ -22,7 +23,7 @@ export default function SidePanel({ selected, history, loading, detailsLoading }
         <ChangeHistory entries={history} />
       </section>
       <section>
-        <RulesList />
+        <RulesList broken={brokenRules} />
       </section>
     </aside>
   );

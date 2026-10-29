@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Review } from '../../useReview.ts';
 import { DAYS } from '../../data.ts';
 import { dayRevenue } from '../../engine/changes.ts';
+import { validateDay } from '../../engine/validate.ts';
 import Header from '../Header.tsx';
 import DayTabs from '../DayTabs.tsx';
 import Toolbar from '../Toolbar.tsx';
@@ -78,6 +79,7 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
           <SidePanel
             selected={selected}
             history={history.filter((h) => h.day === dayIndex)}
+            brokenRules={new Set(validateDay(day, week[dayIndex]).map((v) => v.rule))}
             loading={busy}
             detailsLoading={detailsLoading}
           />

@@ -93,7 +93,7 @@ A login page before anything else, with a logo at the top. The username field is
 - **Side panel:**
   - Click a screening to see its reasons, from the engine.
   - Below that, the change history for the day: one line per drag, with what moved and why.
-- **Rules enforced:** a small collapsible list of the five rules above.
+- **Rules enforced:** a small collapsible list of the five rules above, each in one short sentence with a green checkmark. The checkmark is real: the day's current schedule is checked against that rule by the validator.
 - **Toolbar:**
   - Undo: one change back, as many times as needed.
   - Reset to the engine's schedule: restores the baseline and clears pins; asks for confirmation.
