@@ -13,10 +13,12 @@ import BlockedMessage from '../BlockedMessage.tsx';
 import Modal from '../Modal.tsx';
 import PublishDialog from '../PublishDialog.tsx';
 import PublishedBanner from '../PublishedBanner.tsx';
+import LoadingOverlay from '../LoadingOverlay.tsx';
 
 export default function ReviewPage({ review, onEditRules }: { review: Review; onEditRules: () => void }) {
   const [dialog, setDialog] = useState<'reset' | 'publish'>();
-  const { baseline, week, status, history, highlight, dayIndex, selectedId, blocked } = review;
+  const { baseline, week, status, history, highlight, dayIndex, selectedId, blocked, pending, detailsLoading } = review;
+  const busy = pending !== undefined;
   if (!baseline || !week) return null;
 
   const readOnly = status === 'Published';
@@ -34,6 +36,7 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
         <Header status={status} />
         <Toolbar
           readOnly={readOnly}
+          busy={busy}
           canUndo={history.length > 0}
           onUndo={review.undo}
           onReset={() => setDialog('reset')}
@@ -43,7 +46,7 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
       {readOnly && <PublishedBanner />}
       <div className="review">
         <div className="review-main">
-          <DayTabs selected={dayIndex} onSelect={review.selectDay} />
+          <DayTabs selected={pending?.day ?? dayIndex} disabled={busy} onSelect={review.selectDay} />
           {blocked && <BlockedMessage message={blocked.message} onEditRules={onEditRules} onClose={review.closeBlocked} />}
           <div className="change-summary-slot">
             {shown ? (
@@ -56,20 +59,28 @@ export default function ReviewPage({ review, onEditRules }: { review: Review; on
               </p>
             )}
           </div>
-          <Timeline
-            day={day}
-            schedule={week[dayIndex]}
-            changes={shown?.changes ?? []}
-            readOnly={readOnly}
-            selectedId={selectedId}
-            refused={blocked}
-            onSelect={(s) => review.select(s.id)}
-            onDrop={review.drop}
-          />
+          <div className="timeline-wrap">
+            <Timeline
+              day={day}
+              schedule={week[dayIndex]}
+              changes={shown?.changes ?? []}
+              readOnly={readOnly}
+              selectedId={selectedId}
+              refused={blocked}
+              onSelect={(s) => review.select(s.id)}
+              onDrop={review.drop}
+            />
+            {pending && <LoadingOverlay message={pending.message} />}
+          </div>
         </div>
         <div className="review-side">
-          <RevenueCards dayLabel={`${day.name} ${day.date}`} today={today} week={weekTotals} />
-          <SidePanel selected={selected} history={history.filter((h) => h.day === dayIndex)} />
+          <RevenueCards dayLabel={`${day.name} ${day.date}`} loading={busy} today={today} week={weekTotals} />
+          <SidePanel
+            selected={selected}
+            history={history.filter((h) => h.day === dayIndex)}
+            loading={busy}
+            detailsLoading={detailsLoading}
+          />
         </div>
       </div>
 

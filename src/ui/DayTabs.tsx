@@ -1,13 +1,20 @@
 import { DAYS } from '../data.ts';
 import { fmt } from '../time.ts';
 
-export default function DayTabs({ selected, onSelect }: { selected: number; onSelect: (i: number) => void }) {
+interface Props {
+  selected: number;
+  disabled: boolean; // while loading
+  onSelect: (i: number) => void;
+}
+
+export default function DayTabs({ selected, disabled, onSelect }: Props) {
   return (
     <nav className="day-tabs">
       {DAYS.map((d) => (
         <button
           key={d.index}
           className={`day-tab${d.index === selected ? ' selected' : ''}${d.weekend ? ' weekend' : ''}`}
+          disabled={disabled}
           onClick={() => onSelect(d.index)}
         >
           <span className="day-name">

@@ -117,6 +117,20 @@ A simple left nav with two items: Setup & Generate, Review. The app opens on the
 ### Look and feel
 A light, soothing palette; a clean web font (Inter); generous spacing. The Review screen uses the full height of the window: the timeline rows are tall enough that the timeline is not followed by a large empty area.
 
+### Loading feedback (simulated)
+Every click that changes what is shown goes through a short, simulated loading state, so people trying the prototype see that a change is coming. Nothing changes on screen until the loading ends. The engine itself stays instant and pure; the delay lives only in the UI.
+- A grey, semi-transparent overlay with a spinner and a plain message covers the area that is about to change.
+- While loading, numbers that will change (the revenue cards) show "~~~" and blink; the side panel pulses; the toolbar, day tabs and nav can't be clicked.
+- Moments and messages (durations are approximate):
+  - Login: "Signing in…" (~1 s).
+  - Switching between Setup & Generate and Review: "Opening Review…" (~0.8 s).
+  - Generate: "Generating the schedule for the week of June 6th…" (~2 s).
+  - Switching day: "Loading Monday's schedule…" (~1 s).
+  - A drag: "Rearranging the schedule to fit your change…" (~3 s), then the result with its highlights.
+  - A blocked drag: "Checking your change against the rules…" (~1 s), then the message.
+  - Undo: "Undoing the last change…" (~1.5 s). Reset: "Restoring the engine's schedule…" (~2 s). Publish: "Publishing the week…" (~2 s).
+  - Clicking a screening: its reasons in the side panel load briefly (~0.6 s).
+
 ## Out of scope; don't build
 Other sites, chat or any language-model call, editing inputs, multi-user approval, editing a published schedule ("Create new version" can be a disabled button), unpinning, holidays and seasonal overrides, swapping which movie plays in a screening, persistence, real authentication (the login page is a fake), mobile layout.
 

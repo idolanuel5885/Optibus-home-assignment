@@ -14,6 +14,8 @@ npm run dev
 
 ## Demo script
 
+Every click shows a short simulated loading state (a drag takes about 3 seconds) before the result appears.
+
 1. **Login:** the fields are prefilled (a fake login); click **Log in**.
    **Setup & Generate:** look over the inputs, then click **Generate schedule for the week of June 6th**. Review opens on Sunday.
 2. **Click a screening:** click Blue Hour in Theatre 1 (13:55). Its reasons appear in the side panel.

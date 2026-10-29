@@ -31,9 +31,11 @@ export const START_STEP = 5; // start times on 5-minute steps
 const WEEKDAY = { open: 11 * 60, close: 24 * 60 + 30 }; // 11:00–00:30
 const WEEKEND = { open: 10 * 60, close: 25 * 60 + 30 }; // 10:00–01:30
 
+const LONG_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 export const DAYS: Day[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((name, index) => {
   const weekend = index >= 5;
-  return { index, name, date: `${6 + index} Jun`, weekend, ...(weekend ? WEEKEND : WEEKDAY) };
+  return { index, name, longName: LONG_NAMES[index], date: `${6 + index} Jun`, weekend, ...(weekend ? WEEKEND : WEEKDAY) };
 });
 
 export const theatreById = (id: number): Theatre => THEATRES.find((t) => t.id === id)!;

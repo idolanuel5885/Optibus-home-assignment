@@ -2,10 +2,11 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { MOVIES, NIGHT_CREW_FROM, SITES, SUMMER_OVERRIDE, THEATRES, TICKET_PRICE, WEEKDAY_HOURS, WEEKEND_HOURS } from '../../data.ts';
 import { fmt } from '../../time.ts';
 import Modal from '../Modal.tsx';
+import LoadingOverlay from '../LoadingOverlay.tsx';
+import { LOADING_MS } from '../loading.ts';
 
 export type SetupBox = 'theatres';
 
-const FAKE_LOADING_MS = 1200;
 const hours = (h: { open: number; close: number }) => `${fmt(h.open)}–${fmt(h.close)}`;
 
 interface BoxProps {
@@ -57,7 +58,7 @@ export default function SetupGeneratePage({ focus, generated, onGenerate }: Prop
     const t = setTimeout(() => {
       setLoading(false);
       onGenerate();
-    }, FAKE_LOADING_MS);
+    }, LOADING_MS.generate);
     return () => clearTimeout(t);
   }, [loading, onGenerate]);
 
@@ -142,6 +143,8 @@ export default function SetupGeneratePage({ focus, generated, onGenerate }: Prop
           {generated && <span className="muted">Generated. Use Reset in Review to go back to the engine's schedule.</span>}
         </div>
       </div>
+
+      {loading && <LoadingOverlay message="Generating the schedule for the week of June 6th…" />}
 
       {editing && (
         <Modal title="Edit" onCancel={() => setEditing(false)}>

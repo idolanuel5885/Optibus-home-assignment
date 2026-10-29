@@ -5,12 +5,13 @@ export type Page = 'setup' | 'review';
 interface Props {
   page: Page;
   canReview: boolean;
+  disabled: boolean; // while something is loading
   onNavigate: (page: Page) => void;
 }
 
-export default function Nav({ page, canReview, onNavigate }: Props) {
+export default function Nav({ page, canReview, disabled: busy, onNavigate }: Props) {
   const item = (id: Page, label: string, disabled = false) => (
-    <button className={`nav-item${page === id ? ' active' : ''}`} disabled={disabled} onClick={() => onNavigate(id)}>
+    <button className={`nav-item${page === id ? ' active' : ''}`} disabled={disabled || busy} onClick={() => onNavigate(id)}>
       {label}
     </button>
   );

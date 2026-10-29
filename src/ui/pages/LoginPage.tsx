@@ -1,11 +1,15 @@
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
+import { LOADING_MS } from '../loading.ts';
 import Logo from '../Logo.tsx';
 
 // A fake login: the fields are prefilled and Login always succeeds.
 export default function LoginPage({ onLogin }: { onLogin: () => void }) {
+  const [signingIn, setSigningIn] = useState(false);
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    onLogin();
+    if (signingIn) return;
+    setSigningIn(true);
+    setTimeout(onLogin, LOADING_MS.login);
   };
   return (
     <div className="login-page">
@@ -22,8 +26,9 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
           Password
           <input type="password" defaultValue="demopassword" autoComplete="off" />
         </label>
-        <button type="submit" className="primary big">
-          Log in
+        <button type="submit" className="primary big login-button" disabled={signingIn}>
+          {signingIn && <span className="spinner small" aria-hidden="true" />}
+          {signingIn ? 'Signing in…' : 'Log in'}
         </button>
       </form>
     </div>

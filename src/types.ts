@@ -18,6 +18,7 @@ export interface Movie {
 export interface Day {
   index: number; // 0 = Sun … 6 = Sat
   name: string; // "Sun"
+  longName: string; // "Sunday"
   date: string; // "6 Jun"
   weekend: boolean;
   open: Minutes;
