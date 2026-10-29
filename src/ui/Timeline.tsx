@@ -1,13 +1,22 @@
-import type { Day, DaySchedule } from '../types.ts';
+import type { Day, DaySchedule, Drag } from '../types.ts';
 import { THEATRES, movieById } from '../data.ts';
 import { fmt } from '../time.ts';
 import { movieColor } from './colors.ts';
+import { useDrag } from './useDrag.ts';
 import './Timeline.css';
 
 const PX_PER_MIN = 1.5;
 const PAST_CLOSE = 40; // minutes shown after closing, for the end-of-night cleaning
 
-export default function Timeline({ day, schedule }: { day: Day; schedule: DaySchedule }) {
+interface Props {
+  day: Day;
+  schedule: DaySchedule;
+  onDrop: (drag: Drag) => void;
+}
+
+export default function Timeline({ day, schedule, onDrop }: Props) {
+  const { active, blockHandlers, laneRef } = useDrag(PX_PER_MIN, onDrop, () => {});
+  const dragged = active && movieById(active.origin.movieId);
   const from = day.open;
   const to = day.close + PAST_CLOSE;
   const x = (m: number) => (m - from) * PX_PER_MIN;
@@ -35,7 +44,7 @@ export default function Timeline({ day, schedule }: { day: Day; schedule: DaySch
                   {t.seats} seats{t.premium ? ' · premium' : ''}
                 </span>
               </div>
-              <div className="tl-lane">
+              <div className="tl-lane" ref={laneRef(t.id)}>
                 {hours.map((h) => (
                   <div key={h} className="tl-hour-line" style={{ left: x(h) }} />
                 ))}
@@ -45,7 +54,8 @@ export default function Timeline({ day, schedule }: { day: Day; schedule: DaySch
                   return (
                     <div key={s.id}>
                       <div
-                        className="tl-block"
+                        className={`tl-block${active?.screeningId === s.id ? ' dragging' : ''}`}
+                        {...blockHandlers(s)}
                         style={{ left: x(s.start), width: x(s.end) - x(s.start), background: movieColor(m.id) }}
                         title={`${m.title} ${fmt(s.start)}–${fmt(s.end)}`}
                       >
@@ -62,6 +72,17 @@ export default function Timeline({ day, schedule }: { day: Day; schedule: DaySch
                     </div>
                   );
                 })}
+                {active && dragged && active.theatreId === t.id && (
+                  <div
+                    className="tl-preview"
+                    style={{ left: x(active.start), width: dragged.runtime * PX_PER_MIN, borderColor: movieColor(dragged.id) }}
+                  >
+                    <span className="tl-title">{dragged.title}</span>
+                    <span className="tl-time">
+                      {fmt(active.start)}–{fmt(active.start + dragged.runtime)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           );

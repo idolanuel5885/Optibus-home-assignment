@@ -53,3 +53,36 @@ export interface Screening {
 
 export type DaySchedule = Screening[];
 export type WeekSchedule = DaySchedule[]; // indexed by Day.index
+
+// ---- Re-plan ----
+
+export interface Drag {
+  screeningId: string;
+  theatreId: number;
+  start: Minutes;
+}
+
+export interface Place {
+  theatreId: number;
+  start: Minutes;
+}
+
+// Why a screening changed in a re-plan. The UI formats these; it never invents them.
+export type ChangeWhy =
+  | { kind: 'dragged' }
+  | { kind: 'madeRoom'; forId: string } // shifted later in its theatre to make room
+  | { kind: 'movedToGap'; forId: string } // moved into the gap the dragged screening left
+  | { kind: 'filledGap'; forId: string } // added in the gap the dragged screening left
+  | { kind: 'nightCrew'; theatreId: number; until: Minutes } // shifted later to wait for the single night crew
+  | { kind: 'noRoom'; forId: string }; // removed: no longer fits before closing
+
+export type Change =
+  | { kind: 'moved'; screeningId: string; movieId: string; from: Place; to: Place; why: ChangeWhy }
+  | { kind: 'added'; screeningId: string; movieId: string; to: Place; why: ChangeWhy }
+  | { kind: 'removed'; screeningId: string; movieId: string; from: Place; why: ChangeWhy };
+
+export type BlockKind = 'opening' | 'closing' | 'pinned' | 'coverage' | 'nightCrew';
+
+export type ReplanResult =
+  | { ok: true; schedule: DaySchedule; changes: Change[]; revenueDelta: number }
+  | { ok: false; block: BlockKind; message: string };
